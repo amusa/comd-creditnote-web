@@ -41,7 +41,7 @@ public class RestDeliveryService implements DeliveryClient {
     private final static String DELIVERY_SERVICE_URL = "http://localhost:8090/comd-delivery-api/v1";
 
     @Override
-    public List<Delivery> delivery(String blDate, String vesselId, String customerId) {
+    public List<Delivery> delivery(String blDate, String vesselId, String customerId)throws Exception {
         client = ClientBuilder.newClient();
         target = client.target(DELIVERY_SERVICE_URL)
                 .path("/delivery")
@@ -55,6 +55,8 @@ public class RestDeliveryService implements DeliveryClient {
             if (response.getStatus() == 200) {
                 deliveries = response.readEntity(new GenericType<List<Delivery>>() {
                 });
+            }else{
+                 throw new Exception("No data returned from server");
             }
         } finally {
             response.close();

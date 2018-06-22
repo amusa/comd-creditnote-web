@@ -13,6 +13,6 @@ import java.util.List;
  * @author maliska
  */
 public interface DeliveryClient {
-    List<Delivery> delivery(String blDate, String vesselId, String customerId);
+    List<Delivery> delivery(String blDate, String vesselId, String customerId) throws Exception;
     
 }

@@ -37,7 +37,7 @@
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Link</a>
@@ -62,7 +62,7 @@
         </nav>
 
         <main role="main" class="container-fluid">
-
+            <h:messages id="msgs" showDetail="false" class="alert alert-danger" pt:role="alert" />
             <div class="starter-template">
                 <h1>Deliveries</h1>
                 <!--<p class="lead">Basic grid layouts to get you familiar with building within the Bootstrap grid system.</p>-->
@@ -72,22 +72,22 @@
                         <div class="col">
                             <h:inputText id="txtBlDate" value="#{listController.blDate}" class="form-control" pt:placeholder="B/L Date">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
-                                <f:ajax />
+                                <!--<f:ajax />-->
                             </h:inputText>
                         </div>
                         <div class="col">
                             <input jsf:id="txtVessel" jsf:value="#{listController.vesselId}" type="text" class="form-control" placeholder="Vessel">
-                                <f:ajax />
+                                <!--<f:ajax />-->
                             </input>
                         </div>
                         <div class="col">
-                            <h:inputText value="#{listController.customerId}" class="form-control" pt:placeholder="Customer">
-                                <f:ajax />
+                            <h:inputText  id="txtCustomer" value="#{listController.customerId}" class="form-control" pt:placeholder="Customer">
+                                <!--<f:ajax />-->
                             </h:inputText>
                         </div>
                         <button jsf:id="findBtn"  type="button" class="btn btn-primary">Find Delivery
                             <f:ajax listener="#{listController.findDeliveries}" event="click"
-                                    render="delvTable txtBlDate txtVessel"/>
+                                    render="delvTable msgs" execute="delvForm txtBlDate txtVessel txtCustomer"/>
                         </button>
                     </div>
                     <br/>
@@ -111,11 +111,23 @@
                             <tbody>
                                 <ui:repeat value="#{listController.deliveries}" var="delivery">
                                     <tr>
-                                        <th scope="row">#{delivery.blDate}</th>
+                                        <th scope="row">
+                                            <h:outputText value=" #{delivery.blDate}">
+                                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                                            </h:outputText>                                           
+                                        </th>
                                         <td>#{delivery.vesselName}</td>
                                         <td>#{delivery.quantity}</td>
-                                        <td>#{delivery.unitPrice}</td>
-                                        <td>@#{delivery.netValue}</td>
+                                        <td>
+                                            <h:outputText value="#{delivery.unitPrice}">
+                                                <f:convertNumber pattern="###,###,###.####" />
+                                            </h:outputText>
+                                        </td>
+                                        <td>
+                                            <h:outputText value="#{delivery.netValue}">
+                                                <f:convertNumber pattern="###,###,###.####" />
+                                            </h:outputText>
+                                        </td>
                                         <td>#{delivery.crudeName}</td>
                                         <td>#{delivery.producer}</td>
                                         <td>#{delivery.invoiceNumber}</td>
@@ -128,8 +140,8 @@
                                                 </a>
 
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                    <a class="dropdown-item" href="#">View</a>
-                                                    <a class="dropdown-item" href="#">Credit Note</a>                                                
+                                                    <a class="dropdown-item" href="#">View Detail</a>
+                                                    <a class="dropdown-item" href="#">Post Credit Note</a>                                                
                                                 </div>
                                             </div>
                                         </td>                                    

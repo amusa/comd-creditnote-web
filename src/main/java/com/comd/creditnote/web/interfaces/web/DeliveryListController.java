@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.comd.creditnote.web.util.CreditNoteLogger;
+import com.comd.creditnote.web.util.JsfUtil;
 import javax.enterprise.context.SessionScoped;
 
 /**
@@ -41,7 +42,13 @@ public class DeliveryListController implements Serializable {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = blDate != null ? format.format(blDate) : null;
         logger.log(Level.INFO, "about to execute find...{0} {1} {2}", new Object[]{dateStr, vesselId, customerId});
-        deliveries = getClient().delivery(dateStr, vesselId, customerId);
+        try {
+            deliveries = getClient().delivery(dateStr, vesselId, customerId);
+            JsfUtil.addErrorMessage("Delivery fetched from SAP successfully!");
+        } catch (Exception ex) {
+            JsfUtil.addErrorMessage(ex.getMessage());
+            Logger.getLogger(DeliveryListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private DeliveryClient getClient() {
@@ -53,6 +60,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setBlDate(Date blDate) {
+        logger.log(Level.INFO,"setting bldate {0}...", blDate);
         this.blDate = blDate;
     }
 
@@ -61,6 +69,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setCustomerId(String customerId) {
+        logger.log(Level.INFO,"setting customerId {0}...", customerId);
         this.customerId = customerId;
     }
 
@@ -69,6 +78,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setVesselId(String vesselId) {
+        logger.log(Level.INFO,"setting vesselId {0}...", vesselId);
         this.vesselId = vesselId;
     }
 
