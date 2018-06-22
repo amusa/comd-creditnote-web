@@ -19,6 +19,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.comd.creditnote.web.util.CreditNoteLogger;
+import java.util.logging.Level;
 import javax.ws.rs.core.GenericType;
 //import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -28,10 +29,10 @@ import javax.ws.rs.core.GenericType;
  */
 @Stateless
 public class RestDeliveryService implements DeliveryClient {
-
+    
     private Client client;
     private WebTarget target;
-
+    
     @CreditNoteLogger
     @Inject
     Logger logger;
@@ -39,30 +40,37 @@ public class RestDeliveryService implements DeliveryClient {
     // @Inject
     //ConfigProperty(name = "DELIVERY_SERVICE_URL")
     private final static String DELIVERY_SERVICE_URL = "http://localhost:8090/comd-delivery-api/v1";
-
+    
     @Override
-    public List<Delivery> delivery(String blDate, String vesselId, String customerId)throws Exception {
+    public List<Delivery> delivery(String blDate, String vesselId, String customerId) throws Exception {
         client = ClientBuilder.newClient();
         target = client.target(DELIVERY_SERVICE_URL)
                 .path("/delivery")
                 .queryParam("bldate", blDate)
                 .queryParam("customer", customerId)
                 .queryParam("vessel", vesselId);
-
+        
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         List<Delivery> deliveries = new ArrayList<>();
         try {
             if (response.getStatus() == 200) {
                 deliveries = response.readEntity(new GenericType<List<Delivery>>() {
                 });
-            }else{
-                 throw new Exception("No data returned from server");
+            } else if (response.getStatus() == 400) {
+                throw new Exception("No data returned for the given selection");
+            } else if (response.getStatus() == 404) {
+                throw new Exception("Resource not found");
+            } else if (response.getStatus() == 500) {
+                throw new Exception("Internal server error!");
+            } else {
+                logger.log(Level.SEVERE, "could not connect to service. return code {0}", response.getStatus());
+                throw new Exception("Unexpected error occured!");
             }
         } finally {
             response.close();
         }
-
+        
         return deliveries;
     }
-
+    
 }
