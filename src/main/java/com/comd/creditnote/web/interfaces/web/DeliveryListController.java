@@ -46,6 +46,7 @@ public class DeliveryListController implements Serializable {
             deliveries = getClient().delivery(dateStr, vesselId, customerId);
             JsfUtil.addErrorMessage("Delivery fetched from SAP successfully!");
         } catch (Exception ex) {
+            deliveries = null;
             JsfUtil.addErrorMessage(ex.getMessage());
             Logger.getLogger(DeliveryListController.class.getName()).log(Level.SEVERE, null, ex);
         }
