@@ -16,7 +16,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import com.comd.creditnote.web.util.CreditNoteLogger;
 import com.comd.creditnote.web.util.JsfUtil;
+import java.io.IOException;
+import java.text.ParseException;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 
 /**
  *
@@ -82,9 +85,13 @@ public class DeliveryListController implements Serializable {
         }
     }
 
-    public String creditNoteAdvice() {
+    public void creditNoteAdvice() throws IOException {
         logger.log(Level.INFO, "navigating to creditnoteadvice.xhtml page...");
-        return "creditnoteadvice?faces-redirect=true&includeViewParams=true";
+
+        FacesContext.getCurrentInstance().getExternalContext()
+                .redirect(String.format("invoice?customer=%s&bldate=%s", customerId, getDateAsString()));
+
+        // return "creditnoteadvice?faces-redirect=true&includeViewParams=true";
     }
 
     private DeliveryClient getDeliveryClient() {
@@ -151,5 +158,10 @@ public class DeliveryListController implements Serializable {
     public String getDateAsString() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         return blDate != null ? format.format(blDate) : null;
+    }
+
+    public void setDateAsString(String dateStr) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        this.blDate = (dateStr != null ? format.parse(dateStr) : null);
     }
 }

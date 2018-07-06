@@ -146,9 +146,10 @@
                                                 </a>                                                
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                                     <a class="dropdown-item" href="#">View Detail</a>
-                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:action="#{listController.creditNoteAdvice}">
-                                                        View Credit Note Advice                                                                                                              
+                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:actionListener="#{listController.creditNoteAdvice}">
+                                                        View Credit Note                                                                                                              
                                                     </button>
+                                                    <a class="dropdown-item" href="#">View Debit Note</a>
                                                     <button jsf:id="btnPostCreditNote" class="dropdown-item" data-target="#postCreditNoteDlg" data-toggle="modal">
                                                         Post Credit Note
                                                         <f:setPropertyActionListener target="#{listController.selectedDelivery}" value="#{delivery}" />
