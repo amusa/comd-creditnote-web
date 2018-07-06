@@ -10,5 +10,7 @@ package com.comd.creditnote.web.interfaces.web;
  * @author maliska
  */
 public interface CreditNoteClient {
-    
+
+    String post(String blDate, String vesselId, String customerId, String invoice, double amount) throws Exception;
+
 }

@@ -14,6 +14,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.wildfly-swarm>2018.5.0</version.wildfly-swarm>
+        <docker.image>maliska/creditnote-web:latest</docker.image>
     </properties>
     
     <build>
@@ -36,6 +37,72 @@
                     </properties>
                 </configuration>
             </plugin>
+            <!--            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.26.0</version>                
+                <configuration>
+                    <images>
+                        <image>
+                            <name>${docker.image}</name>
+                            <build>
+                                <from>java:8</from>
+                                <maintainer>mayemij@gmail.com</maintainer>
+                                <ports>
+                                    <port>8180</port>
+                                </ports>
+                                <assembly>
+                                    <inline>
+                                        <files>
+                                            <file>
+                                                <source>${project.build.directory}/${project.artifactId}-swarm.jar</source>
+                                            </file>
+                                        </files>
+                                    </inline>
+                                </assembly>
+                                <cmd>java -jar /maven/${project.artifactId}-swarm.jar</cmd>
+                            </build>
+                            <run>
+                                <ports>
+                                     Map container port 8080 to a dynamical port 
+                                    <port>${swarm.port}:8180</port>
+                                </ports>
+                                                                <env>
+                                    <COUCHBASE_URI>${docker.host.address}</COUCHBASE_URI>
+                                </env>
+                                <wait>
+                                    <http>
+                                        <url>http://${docker.host.address}:${swarm.port}/webresources/airline</url>
+                                        <status>200</status>
+                                    </http>
+                                    <time>60000</time>
+                                </wait>
+                                <log>
+                                    <color>yellow</color>
+                                    <prefix>SWARM</prefix>
+                                </log>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>docker:build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>docker:start</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>start</goal>
+                            <goal>logs</goal>
+                        </goals>
+                    </execution>
+                </executions>                
+            </plugin>-->
         </plugins>
     </build>
     
@@ -43,6 +110,11 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>comd-delivery-lib</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>comd-creditnote-lib</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -54,11 +126,6 @@
             <groupId>org.wildfly.swarm</groupId>
             <artifactId>microprofile</artifactId>
         </dependency>  -->
-        <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>6.2</version>
-        </dependency>
     </dependencies>
     
     <dependencyManagement>

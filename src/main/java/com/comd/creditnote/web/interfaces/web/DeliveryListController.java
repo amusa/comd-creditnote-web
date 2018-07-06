@@ -33,17 +33,22 @@ public class DeliveryListController implements Serializable {
     @Inject
     private DeliveryClient deliveryClient;
 
+    @Inject
+    private CreditNoteClient creditNoteClient;
+
     private Date blDate;
     private String customerId;
     private String vesselId;
     private List<Delivery> deliveries;
+    private Delivery selectedDelivery;
+    private Double creditNoteAmount;
 
     public void findDeliveries() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = blDate != null ? format.format(blDate) : null;
         logger.log(Level.INFO, "about to execute find...{0} {1} {2}", new Object[]{dateStr, vesselId, customerId});
         try {
-            deliveries = getClient().delivery(dateStr, vesselId, customerId);
+            deliveries = getDeliveryClient().delivery(dateStr, vesselId, customerId);
             JsfUtil.addErrorMessage("Delivery fetched from SAP successfully!");
         } catch (Exception ex) {
             deliveries = null;
@@ -52,8 +57,42 @@ public class DeliveryListController implements Serializable {
         }
     }
 
-    private DeliveryClient getClient() {
+    public void postCreditNote() throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String dateStr = blDate != null ? format.format(blDate) : null;
+        String invoice;
+
+        if (selectedDelivery == null) {
+            throw new Exception("Error: Delivery not selected!");
+        }
+
+        if (creditNoteAmount == null) {
+            throw new Exception("Error: Credit note amount not set!");
+        }
+
+        invoice = selectedDelivery.getInvoiceNumber();
+        logger.log(Level.INFO, "about to post...{0} {1} {2} {3} {4}",
+                new Object[]{dateStr, vesselId, customerId, invoice, creditNoteAmount});
+        try {
+            String message = getCreditNoteClient().post(dateStr, vesselId, customerId, invoice, creditNoteAmount);
+            JsfUtil.addErrorMessage(message);
+        } catch (Exception ex) {
+            JsfUtil.addErrorMessage(ex.getMessage());
+            Logger.getLogger(DeliveryListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public String creditNoteAdvice() {
+        logger.log(Level.INFO, "navigating to creditnoteadvice.xhtml page...");
+        return "creditnoteadvice?faces-redirect=true&includeViewParams=true";
+    }
+
+    private DeliveryClient getDeliveryClient() {
         return deliveryClient;
+    }
+
+    private CreditNoteClient getCreditNoteClient() {
+        return creditNoteClient;
     }
 
     public Date getBlDate() {
@@ -61,7 +100,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setBlDate(Date blDate) {
-        logger.log(Level.INFO,"setting bldate {0}...", blDate);
+        logger.log(Level.INFO, "setting bldate {0}...", blDate);
         this.blDate = blDate;
     }
 
@@ -70,7 +109,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setCustomerId(String customerId) {
-        logger.log(Level.INFO,"setting customerId {0}...", customerId);
+        logger.log(Level.INFO, "setting customerId {0}...", customerId);
         this.customerId = customerId;
     }
 
@@ -79,7 +118,7 @@ public class DeliveryListController implements Serializable {
     }
 
     public void setVesselId(String vesselId) {
-        logger.log(Level.INFO,"setting vesselId {0}...", vesselId);
+        logger.log(Level.INFO, "setting vesselId {0}...", vesselId);
         this.vesselId = vesselId;
     }
 
@@ -91,4 +130,26 @@ public class DeliveryListController implements Serializable {
         this.deliveries = deliveries;
     }
 
+    public Delivery getSelectedDelivery() {
+        return selectedDelivery;
+    }
+
+    public void setSelectedDelivery(Delivery selectedDelivery) {
+        logger.log(Level.INFO, "setting selected delivery {0}", selectedDelivery);
+        this.selectedDelivery = selectedDelivery;
+    }
+
+    public Double getCreditNoteAmount() {
+        return creditNoteAmount;
+    }
+
+    public void setCreditNoteAmount(Double creditNoteAmount) {
+        logger.log(Level.INFO, "setting credit note amount {0}", creditNoteAmount);
+        this.creditNoteAmount = creditNoteAmount;
+    }
+
+    public String getDateAsString() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return blDate != null ? format.format(blDate) : null;
+    }
 }
