@@ -5,6 +5,8 @@
  */
 package com.comd.creditnote.web.domain.model;
 
+import com.comd.customer.lib.v1.response.Address;
+
 /**
  *
  * @author maliska

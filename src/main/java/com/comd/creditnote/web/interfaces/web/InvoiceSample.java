@@ -7,6 +7,7 @@ package com.comd.creditnote.web.interfaces.web;
 
 import com.comd.creditnote.web.application.CreditNoteService;
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
+import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -45,12 +46,12 @@ public class InvoiceSample extends HttpServlet {
     @Inject
     private CreditNoteService creditNoteService;
 
-    private CreditNoteAdvice creditNoteAdvice;
+    private static CreditNoteAdvice creditNoteAdvice;
 
     ByteArrayOutputStream baos;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, DocumentException {
+            throws ServletException, IOException, DocumentException, CustomerException {
         response.setContentType("text/html;charset=UTF-8");
 
         String customerId = request.getParameter("customer");
@@ -156,20 +157,24 @@ public class InvoiceSample extends HttpServlet {
         BaseFont bf = BaseFont.createFont(ARIAL_BLACK, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font f2 = new Font(bf, 14, Font.BOLD);
 
-        Paragraph line1 = new Paragraph("AMG PETROENERGY LTD", f2);
+        Paragraph line1 = new Paragraph(creditNoteAdvice.getCustomer(), f2);
         line1.setAlignment(Element.ALIGN_LEFT);
         line1.setMultipliedLeading(0.2f);
         reference.add(line1);
 
         addEmptyLine(reference, 1);
 
-        Paragraph line2 = new Paragraph("41 USUMA STREET,", f2);
+        Paragraph line2 = new Paragraph(creditNoteAdvice.getAddress().getStreet(), f2);
         line1.setMultipliedLeading(0.2f);
         reference.add(line2);
 
         addEmptyLine(reference, 1);
 
-        Paragraph line3 = new Paragraph("MAITAMA ABUJA", f2);
+        Paragraph line3 = new Paragraph(String.format("%s, %s",
+                new Object[]{
+                    creditNoteAdvice.getAddress().getCity(),
+                    creditNoteAdvice.getAddress().getState()
+                }), f2);
         line1.setMultipliedLeading(0.2f);
         reference.add(line3);
 
@@ -216,7 +221,7 @@ public class InvoiceSample extends HttpServlet {
         layoutDocument.add(body);
     }
 
-    private void loadCreditNoteAdvice(String customerId, String blDateAsString) {
+    private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws CustomerException {
         creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDateAsString);
     }
 
@@ -260,6 +265,8 @@ public class InvoiceSample extends HttpServlet {
             processRequest(request, response);
         } catch (DocumentException e) {
             e.printStackTrace();
+        } catch (CustomerException ex) {
+            Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -278,6 +285,8 @@ public class InvoiceSample extends HttpServlet {
             processRequest(request, response);
         } catch (DocumentException e) {
             e.printStackTrace();
+        } catch (CustomerException ex) {
+            Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -290,20 +299,5 @@ public class InvoiceSample extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
-    static class Article {
-
-        int SNO;
-        String description;
-        int quantity;
-        double unitPrice;
-
-        public Article(int SNO, String description, int quantity, double unitPrice) {
-            this.SNO = SNO;
-            this.description = description;
-            this.quantity = quantity;
-            this.unitPrice = unitPrice;
-        }
-    }
 
 }

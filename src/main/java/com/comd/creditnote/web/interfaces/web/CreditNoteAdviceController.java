@@ -7,7 +7,9 @@ package com.comd.creditnote.web.interfaces.web;
 
 import com.comd.creditnote.web.application.CreditNoteService;
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
+import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 import com.comd.creditnote.web.util.CreditNoteLogger;
+import com.comd.creditnote.web.util.JsfUtil;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +45,12 @@ public class CreditNoteAdviceController implements Serializable {
 
     public void viewParamListener() {
         logger.log(Level.INFO, "B/L date={0}, customerId={1}", new Object[]{blDate, customerId});
-        creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDate);
+        try {
+            creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDate);
+        } catch (CustomerException cex) {
+            JsfUtil.addErrorMessage(cex.getMessage());
+            logger.log(Level.SEVERE, null, cex);
+        }
     }
 
     public CreditNoteAdvice getCreditNoteAdvice() {

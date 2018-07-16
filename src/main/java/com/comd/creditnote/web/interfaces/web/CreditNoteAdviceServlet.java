@@ -7,6 +7,7 @@ package com.comd.creditnote.web.interfaces.web;
 
 import com.comd.creditnote.web.application.CreditNoteService;
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
+import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.inject.Inject;
 
 /**
@@ -42,7 +45,7 @@ public class CreditNoteAdviceServlet extends HttpServlet {
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, DocumentException {
+            throws ServletException, IOException, DocumentException, CustomerException {
         response.setContentType("text/html;charset=UTF-8");
 
         String customerId = request.getParameter("customer");
@@ -163,7 +166,9 @@ public class CreditNoteAdviceServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             processRequest(request, response);
-        } catch (DocumentException e) {
+                } catch (CustomerException ex) {
+            Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
+} catch (DocumentException e) {
             e.printStackTrace();
         }
     }
@@ -183,6 +188,8 @@ public class CreditNoteAdviceServlet extends HttpServlet {
             processRequest(request, response);
         } catch (DocumentException e) {
             e.printStackTrace();
+        } catch (CustomerException ex) {
+            Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -196,7 +203,7 @@ public class CreditNoteAdviceServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private void loadCreditNoteAdvice(String customerId, String blDateAsString) {
+     private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws CustomerException{
         creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDateAsString);
     }
 
