@@ -5,6 +5,7 @@
  */
 package com.comd.creditnote.web.interfaces.web;
 
+import com.comd.creditnote.lib.v1.CreditNote;
 import com.comd.delivery.lib.v1.Delivery;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ public class DeliveryListController implements Serializable {
     private List<Delivery> deliveries;
     private Delivery selectedDelivery;
     private Double creditNoteAmount;
+    private CreditNote creditNote;
 
     public void findDeliveries() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -57,6 +59,22 @@ public class DeliveryListController implements Serializable {
             deliveries = null;
             JsfUtil.addErrorMessage(ex.getMessage());
             Logger.getLogger(DeliveryListController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void viewCreditNoteListener(Delivery delv) {
+        selectedDelivery = delv;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String dateStr = format.format(selectedDelivery.getBlDate());
+        String custId = selectedDelivery.getCustomer();
+
+        logger.log(Level.INFO, "Viewing Credit Note of blDate={0}, customer={1}", new Object[]{dateStr, custId});
+        try {
+            creditNote = creditNoteClient.creditNoteOfDelivery(dateStr, custId);
+        } catch (Exception ex) {
+            creditNote = null;
+            JsfUtil.addErrorMessage(ex.getMessage());
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 
@@ -164,4 +182,13 @@ public class DeliveryListController implements Serializable {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         this.blDate = (dateStr != null ? format.parse(dateStr) : null);
     }
+
+    public CreditNote getCreditNote() {
+        return creditNote;
+    }
+
+    public void setCreditNote(CreditNote creditNote) {
+        this.creditNote = creditNote;
+    }
+
 }

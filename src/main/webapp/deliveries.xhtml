@@ -146,10 +146,15 @@
                                                 </a>                                                
                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                                                     <a class="dropdown-item" href="#">View Detail</a>
-                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:actionListener="#{listController.creditNoteAdvice}">
-                                                        View Credit Note                                                                                                              
+                                                    <button jsf:id="btnViewCreditNote" class="dropdown-item" data-target="#viewCreditNoteDlg" data-toggle="modal" >
+                                                        View Credit Note   
+                                                        <f:ajax listener="#{listController.viewCreditNoteListener(delivery)}" event="click" render="msgs VwCrdNoteForm"/>
+
                                                     </button>
-                                                    <a class="dropdown-item" href="#">View Debit Note</a>
+                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:actionListener="#{listController.creditNoteAdvice}">
+                                                        View Cr. Note Adv                                                                                                             
+                                                    </button>
+                                                    <a class="dropdown-item" href="#">View Dr. Note Adv</a>
                                                     <button jsf:id="btnPostCreditNote" class="dropdown-item" data-target="#postCreditNoteDlg" data-toggle="modal">
                                                         Post Credit Note
                                                         <f:setPropertyActionListener target="#{listController.selectedDelivery}" value="#{delivery}" />
@@ -304,6 +309,58 @@
                                 Post
                                 <f:ajax event="click" render="msgs" listener="#{listController.postCreditNote}"/>
                             </button>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="viewCreditNoteDlg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content modal-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">View Credit Note</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <h:form id="VwCrdNoteForm">
+                        <div class="modal-body"> 
+                            <div class="form-group row">
+                                <label for="creditNoteNo" class="col-sm-4 col-form-label">Credit Note #</label>
+                                <div class="col-sm-8">
+                                    <input type="text" readonly="true" class="form-control-plaintext" id="creditNoteNo" value="#{listController.creditNote.creditNoteNo}"/>
+                                </div>
+                                <label for="sapDocNo" class="col-sm-4 col-form-label">SAP Doc #</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="sapDocNo" value="#{listController.creditNote.documentNo}"/>
+                                </div>
+                                <label for="dateIssued" class="col-sm-4 col-form-label">Date Issued</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="dateIssued" value="#{listController.creditNote.dateIssue}"/>
+                                </div>
+                                <label for="customer" class="col-sm-4 col-form-label">Customer</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="customer" value="#{listController.creditNote.customer}"/>
+                                </div>
+                                <label for="invoiceNo" class="col-sm-4 col-form-label">Invoice #</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="invoiceNo" value="#{listController.creditNote.invoiceNo}"/>
+                                </div>
+                                <label for="blDate" class="col-sm-4 col-form-label">B/L Date</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="blDate" value="#{listController.creditNote.blDate}"/>
+                                </div>
+                                <label for="amount" class="col-sm-4 col-form-label">Amount</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control-plaintext" id="amount" value="#{listController.creditNote.amount}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>                            
                         </div>
                     </h:form>
                 </div>
