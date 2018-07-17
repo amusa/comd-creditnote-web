@@ -6,12 +6,12 @@
 package com.comd.creditnote.web.application;
 
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
-import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 
 /**
  *
  * @author maliska
  */
 public interface CreditNoteService {
-    public CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate) throws CustomerException;
+    CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate) throws Exception;
+    String postCreditNote(String dateStr, String vesselId, String customerId, String invoice, String creditNoteAmount);
 }

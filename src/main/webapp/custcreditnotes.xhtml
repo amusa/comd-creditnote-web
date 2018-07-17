@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--<!doctype html />-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en" 
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <h:head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+        <meta name="description" content=""/>
+        <meta name="author" content=""/>        
+        <link rel="icon" href="resources/img/favicon.ico"/>
+
+        <title>Customer Credit Notes</title>
+
+        <!-- Bootstrap core CSS -->
+        <link href="resources/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+
+        <!-- Custom styles for this template -->
+        <link href="resources/css/starter-template.css" rel="stylesheet"/>
+        <link href="resources/css/grid.css" rel="stylesheet"/>
+    </h:head>
+    <!--    <f:metadata>        
+            <f:viewParam name="blDate" value="#{listController.dateAsString}" />           
+            <f:viewParam name="customerId" value="#{listController.customerId}" />
+        </f:metadata>-->
+    <body>       
+
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+            <a class="navbar-brand" href="#">Credit Notes</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <!--                    <li class="nav-item">
+                                            <a class="nav-link disabled" href="#">Disabled</a>
+                                        </li>-->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="https://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+                        <div class="dropdown-menu" aria-labelledby="dropdown01">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search"/>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+
+        <main role="main" class="container-fluid">            
+            <div class="starter-template">
+
+                <h:messages id="msgs" showDetail="false" class="alert alert-danger" pt:role="alert" />
+                <h1>Customer Credit Notes</h1>
+                <!--<p class="lead">Basic grid layouts to get you familiar with building within the Bootstrap grid system.</p>-->
+
+                <h:form id="custForm">
+                    <div class="form-row">                        
+                        <div class="col">
+                            <h:inputText  id="txtCustomer" value="#{custCNController.customerId}" class="form-control" pt:placeholder="Customer">
+                                <f:ajax />
+                            </h:inputText>
+                        </div>
+                        <button jsf:id="displayBtn"  type="button" class="btn btn-primary">Display Credit Notes
+                            <f:ajax listener="#{custCNController.customerCreditNoteListener}" event="click"
+                                    render="creditNotesTable msgs" />
+                        </button>
+                    </div>
+                    <br/>
+                    <div class="form-row">                       
+                        <table jsf:id="creditNotesTable" class="table table-bordered table-hover table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Credit Note #</th>
+                                    <th scope="col">SAP Doc #</th>
+                                    <th scope="col">Date Issued</th>
+                                    <th scope="col">Customer</th>
+                                    <th scope="col">Invoice #</th>
+                                    <th scope="col">B/L Date</th>
+                                    <th scope="col">Amount ($)</th>                                    
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ui:repeat value="#{custCNController.creditNotes}" var="creditNote">
+                                    <tr>
+                                        <td>#{creditNote.creditNoteNo}</td>
+                                        <td>#{creditNote.documentNo}</td>
+                                        <td>
+                                            <h:outputText value="#{creditNote.dateIssue}">
+                                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                                            </h:outputText>                                        
+                                        </td>
+                                        <td>#{creditNote.customer}</td>
+                                        <td>#{creditNote.invoiceNo}</td>
+                                        <td>
+                                            <h:outputText value="#{creditNote.blDate}">
+                                                <f:convertDateTime pattern="yyyy-MM-dd" />
+                                            </h:outputText>                                        
+                                        </td>
+                                        <td>
+                                            <h:outputText value="#{creditNote.amount}">
+                                                <f:convertNumber pattern="###,###,###.####" />
+                                            </h:outputText>
+                                        </td>
+
+                                        <td>
+                                            <div class="dropdown">
+                                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Action
+                                                </a>                                                
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">                                                    
+                                                    <button jsf:id="btnPostCreditNote" class="dropdown-item" data-target="#postCreditNoteDlg" data-toggle="modal">
+                                                        Utilize
+                                                        <f:setPropertyActionListener target="#{custCNController.selectedCreditNote}" value="#{creditNote}" />
+                                                        <f:ajax/>
+                                                    </button>                                                     
+                                                </div>
+                                            </div>
+                                        </td>                                    
+                                    </tr>
+
+                                </ui:repeat>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </h:form>
+                <!--                <div class="row">
+                    <div class="col-4">.col-4</div>
+                    <div class="col-4">.col-4</div>
+                    <div class="col-4">.col-4</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4">.col-sm-4</div>
+                    <div class="col-sm-4">.col-sm-4</div>
+                    <div class="col-sm-4">.col-sm-4</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">.col-md-4</div>
+                    <div class="col-md-4">.col-md-4</div>
+                    <div class="col-md-4">.col-md-4</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4">.col-lg-4</div>
+                    <div class="col-lg-4">.col-lg-4</div>
+                    <div class="col-lg-4">.col-lg-4</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-4">.col-xl-4</div>
+                    <div class="col-xl-4">.col-xl-4</div>
+                    <div class="col-xl-4">.col-xl-4</div>
+                </div>
+
+                <h3>Three equal columns</h3>
+                <p>Get three equal-width columns <strong>starting at desktops and scaling to large desktops</strong>. On mobile devices, tablets and below, the columns will automatically stack.</p>
+                <div class="row">
+                    <div class="col-md-4">.col-md-4</div>
+                    <div class="col-md-4">.col-md-4</div>
+                    <div class="col-md-4">.col-md-4</div>
+                </div>
+
+                <h3>Three unequal columns</h3>
+                <p>Get three columns <strong>starting at desktops and scaling to large desktops</strong> of various widths. Remember, grid columns should add up to twelve for a single horizontal block. More than that, and columns start stacking no matter the viewport.</p>
+                <div class="row">
+                    <div class="col-md-3">.col-md-3</div>
+                    <div class="col-md-6">.col-md-6</div>
+                    <div class="col-md-3">.col-md-3</div>
+                </div>
+
+                <h3>Two columns</h3>
+                <p>Get two columns <strong>starting at desktops and scaling to large desktops</strong>.</p>
+                <div class="row">
+                    <div class="col-md-8">.col-md-8</div>
+                    <div class="col-md-4">.col-md-4</div>
+                </div>
+
+                <h3>Full width, single column</h3>
+                <p class="text-warning">No grid classes are necessary for full-width elements.</p>
+
+                <hr>
+
+                <h3>Two columns with two nested columns</h3>
+                <p>Per the documentation, nesting is easy—just put a row of columns within an existing column. This gives you two columns <strong>starting at desktops and scaling to large desktops</strong>, with another two (equal widths) within the larger column.</p>
+                <p>At mobile device sizes, tablets and down, these columns and their nested columns will stack.</p>
+                <div class="row">
+                    <div class="col-md-8">
+                        .col-md-8
+                        <div class="row">
+                            <div class="col-md-6">.col-md-6</div>
+                            <div class="col-md-6">.col-md-6</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">.col-md-4</div>
+                </div>
+
+                <hr>
+
+                <h3>Mixed: mobile and desktop</h3>
+                <p>The Bootstrap v4 grid system has five tiers of classes: xs (extra small), sm (small), md (medium), lg (large), and xl (extra large). You can use nearly any combination of these classes to create more dynamic and flexible layouts.</p>
+                <p>Each tier of classes scales up, meaning if you plan on setting the same widths for xs and sm, you only need to specify xs.</p>
+                <div class="row">
+                    <div class="col-12 col-md-8">.col-12 .col-md-8</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                    <div class="col-6 col-md-4">.col-6 .col-md-4</div>
+                </div>
+                <div class="row">
+                    <div class="col-6">.col-6</div>
+                    <div class="col-6">.col-6</div>
+                </div>
+
+                <hr>
+
+                <h3>Mixed: mobile, tablet, and desktop</h3>
+                <p></p>
+                <div class="row">
+                    <div class="col-12 col-sm-6 col-lg-8">.col-12 .col-sm-6 .col-lg-8</div>
+                    <div class="col-6 col-lg-4">.col-6 .col-lg-4</div>
+                </div>
+                <div class="row">
+                    <div class="col-6 col-sm-4">.col-6 .col-sm-4</div>
+                    <div class="col-6 col-sm-4">.col-6 .col-sm-4</div>
+                    <div class="col-6 col-sm-4">.col-6 .col-sm-4</div>
+                </div>-->
+
+            </div>
+
+
+
+        </main><!-- /.container -->
+        <!-- Modal -->
+        <div class="modal fade" id="postCreditNoteDlg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Post Credit Note</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <h:form id="CrdNoteForm">
+                        <div class="modal-body">
+
+                            <div class="form-row">                                
+                                <div class="col">
+                                    <h:inputText  id="txtCrdNote" value="#{listController.creditNoteAmount}"  class="form-control" pt:placeholder="Credit Note">
+                                        <f:ajax />
+                                    </h:inputText>
+                                </div>                                
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button jsf:id="postCreditNoteBtn" type="button" class="btn btn-primary" data-dismiss="modal">
+                                Post
+                                <f:ajax event="click" render="msgs" listener="#{listController.postCreditNote}"/>
+                            </button>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <!-- Bootstrap core JavaScript
+        ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <!--<script>window.jQuery || document.write('<script src="../../../../assets/js/vendor/jquery-slim.min.js"><\/script>');</script>-->
+        <script src="resources/js/popper.min.js"></script>
+        <script src="resources/bootstrap/js/bootstrap.min.js"></script>
+    </body>
+</html>

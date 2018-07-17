@@ -5,6 +5,9 @@
  */
 package com.comd.creditnote.web.interfaces.web;
 
+import com.comd.creditnote.lib.v1.CreditNote;
+import java.util.List;
+
 /**
  *
  * @author maliska
@@ -12,5 +15,9 @@ package com.comd.creditnote.web.interfaces.web;
 public interface CreditNoteClient {
 
     String post(String blDate, String vesselId, String customerId, String invoice, double amount) throws Exception;
+
+    CreditNote creditNoteOfDelivery(String blDate, String customerId) throws Exception;
+
+    List<CreditNote> creditNotesOfCustomer(String customerId) throws Exception;
 
 }

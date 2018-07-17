@@ -51,7 +51,7 @@ public class InvoiceSample extends HttpServlet {
     ByteArrayOutputStream baos;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, DocumentException, CustomerException {
+            throws ServletException, IOException, DocumentException, CustomerException, Exception {
         response.setContentType("text/html;charset=UTF-8");
 
         String customerId = request.getParameter("customer");
@@ -221,7 +221,7 @@ public class InvoiceSample extends HttpServlet {
         layoutDocument.add(body);
     }
 
-    private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws CustomerException {
+    private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws Exception {
         creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDateAsString);
     }
 
@@ -267,6 +267,8 @@ public class InvoiceSample extends HttpServlet {
             e.printStackTrace();
         } catch (CustomerException ex) {
             Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -286,6 +288,8 @@ public class InvoiceSample extends HttpServlet {
         } catch (DocumentException e) {
             e.printStackTrace();
         } catch (CustomerException ex) {
+            Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(InvoiceSample.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
