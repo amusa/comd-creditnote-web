@@ -5,9 +5,15 @@
  */
 package com.comd.creditnote.web.interfaces.rest;
 
+import com.comd.creditnote.lib.v1.CreditNote;
 import com.comd.creditnote.lib.v1.request.PostCreditNoteRequest;
+import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 import com.comd.creditnote.web.interfaces.web.CreditNoteClient;
 import com.comd.creditnote.web.util.CreditNoteLogger;
+import com.comd.customer.lib.v1.response.Customer;
+import com.comd.customer.lib.v1.response.CustomerResponse;
+import com.comd.delivery.lib.v1.Delivery;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
@@ -16,6 +22,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -77,6 +84,76 @@ public class RestCreditNoteService implements CreditNoteClient {
         }
 
         return responseMessage;
+    }
+
+    @Override
+    public CreditNote creditNoteOfDelivery(String blDate, String customerId) throws Exception {
+        client = ClientBuilder.newClient();
+        target = client.target(CREDITNOTE_SERVICE_URL)
+                .path("/creditnote")
+                .queryParam("bldate", blDate)
+                .queryParam("customer", customerId);
+
+        logger.log(Level.INFO, "Invoking credit note service endpoint: {0}", target.getUri());
+
+        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        CreditNote creditNote;
+        try {
+            if (response.getStatus() == 200) {
+                creditNote = response.readEntity(CreditNote.class);
+            } else if (response.getStatus() == 400) {
+                logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
+                throw new Exception("No data returned for the given selection");
+            } else if (response.getStatus() == 404) {
+                logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
+                throw new Exception("Resource not found");
+            } else if (response.getStatus() == 500) {
+                logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
+                throw new Exception("Internal server error!");
+            } else {
+                logger.log(Level.SEVERE, "Unexpected error occured! return code: {0}", response.getStatus());
+                throw new Exception("Unexpected error occured!");
+            }
+        } finally {
+            response.close();
+        }
+
+        return creditNote;
+    }
+
+    @Override
+    public List<CreditNote> creditNotesOfCustomer(String customerId) throws Exception {
+        client = ClientBuilder.newClient();
+        target = client.target(CREDITNOTE_SERVICE_URL)
+                .path("/creditnote/customer")
+                .path(customerId);
+
+        logger.log(Level.INFO, "Invoking credit note service endpoint: {0}", target.getUri());
+
+        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        List<CreditNote> creditNotes;
+        try {
+            if (response.getStatus() == 200) {            
+                creditNotes = response.readEntity(new GenericType<List<CreditNote>>() {
+                });
+            } else if (response.getStatus() == 400) {
+                logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
+                throw new Exception("No data returned for the given selection");
+            } else if (response.getStatus() == 404) {
+                logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
+                throw new Exception("Resource not found");
+            } else if (response.getStatus() == 500) {
+                logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
+                throw new Exception("Internal server error!");
+            } else {
+                logger.log(Level.SEVERE, "Unexpected error occured! return code: {0}", response.getStatus());
+                throw new Exception("Unexpected error occured!");
+            }
+        } finally {
+            response.close();
+        }
+
+        return creditNotes;
     }
 
 }

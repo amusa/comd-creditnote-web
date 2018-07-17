@@ -42,14 +42,16 @@ public class RestCustomerService implements CustomerClient {
 
     // @Inject
     //ConfigProperty(name = "DELIVERY_SERVICE_URL")
-    private final static String DELIVERY_SERVICE_URL = "http://localhost:8090/comd-delivery-api/v1";
+    private final static String CUSTOMER_SERVICE_URL = "http://localhost:9090/comd-customer-api/v1";
 
     @Override
     public Customer customer(String customerNumber) throws CustomerException {
         client = ClientBuilder.newClient();
-        target = client.target(DELIVERY_SERVICE_URL)
-                .path("/customer")
-                .queryParam("customerId", customerNumber);
+        target = client.target(CUSTOMER_SERVICE_URL)
+                .path("/customer/")
+                .path(customerNumber);
+        
+        logger.log(Level.INFO, "Invoking customer service endpoint: {0}", target.getUri());
 
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         Customer customer;
@@ -58,13 +60,16 @@ public class RestCustomerService implements CustomerClient {
                 CustomerResponse customerResponse = response.readEntity(CustomerResponse.class);
                 customer = customerResponse.getCustomer();
             } else if (response.getStatus() == 400) {
+                 logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
                 throw new CustomerException("No data returned for the given selection");
             } else if (response.getStatus() == 404) {
+                 logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
                 throw new CustomerException("Resource not found");
             } else if (response.getStatus() == 500) {
+                 logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
                 throw new CustomerException("Internal server error!");
             } else {
-                logger.log(Level.SEVERE, "could not connect to service. return code {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Unexpected error occured! return code: {0}", response.getStatus());
                 throw new CustomerException("Unexpected error occured!");
             }
         } finally {
@@ -77,9 +82,11 @@ public class RestCustomerService implements CustomerClient {
     @Override
     public List<Customer> customers() throws CustomerException {
         client = ClientBuilder.newClient();
-        target = client.target(DELIVERY_SERVICE_URL)
+        target = client.target(CUSTOMER_SERVICE_URL)
                 .path("/customer");
 
+        logger.log(Level.INFO, "Invoking customer service endpoint: {0}", target.getUri());
+        
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         List<Customer> customers = new ArrayList<>();
         try {
@@ -87,13 +94,16 @@ public class RestCustomerService implements CustomerClient {
                 CustomerListResponse customerResponse = response.readEntity(CustomerListResponse.class);
                 customers = customerResponse.getCustomerList();
             } else if (response.getStatus() == 400) {
+                 logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
                 throw new CustomerException("No data returned for the given selection");
             } else if (response.getStatus() == 404) {
+                 logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
                 throw new CustomerException("Resource not found");
             } else if (response.getStatus() == 500) {
+                logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
                 throw new CustomerException("Internal server error!");
             } else {
-                logger.log(Level.SEVERE, "could not connect to service. return code {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Unexpected error occured!. return code {0}", response.getStatus());
                 throw new CustomerException("Unexpected error occured!");
             }
         } finally {

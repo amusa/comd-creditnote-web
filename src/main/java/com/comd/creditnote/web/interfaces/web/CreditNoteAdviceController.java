@@ -47,7 +47,7 @@ public class CreditNoteAdviceController implements Serializable {
         logger.log(Level.INFO, "B/L date={0}, customerId={1}", new Object[]{blDate, customerId});
         try {
             creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDate);
-        } catch (CustomerException cex) {
+        } catch (Exception cex) {
             JsfUtil.addErrorMessage(cex.getMessage());
             logger.log(Level.SEVERE, null, cex);
         }

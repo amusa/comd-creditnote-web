@@ -45,7 +45,7 @@ public class CreditNoteAdviceServlet extends HttpServlet {
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, DocumentException, CustomerException {
+            throws ServletException, IOException, DocumentException, CustomerException, Exception {
         response.setContentType("text/html;charset=UTF-8");
 
         String customerId = request.getParameter("customer");
@@ -170,6 +170,8 @@ public class CreditNoteAdviceServlet extends HttpServlet {
             Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
 } catch (DocumentException e) {
             e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -190,6 +192,8 @@ public class CreditNoteAdviceServlet extends HttpServlet {
             e.printStackTrace();
         } catch (CustomerException ex) {
             Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(CreditNoteAdviceServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -203,7 +207,7 @@ public class CreditNoteAdviceServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-     private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws CustomerException{
+     private void loadCreditNoteAdvice(String customerId, String blDateAsString) throws CustomerException, Exception{
         creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDateAsString);
     }
 
