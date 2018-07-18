@@ -8,13 +8,11 @@ package com.comd.creditnote.web.interfaces.web;
 import com.comd.creditnote.lib.v1.CreditNote;
 import com.comd.creditnote.web.util.CreditNoteLogger;
 import com.comd.creditnote.web.util.JsfUtil;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
