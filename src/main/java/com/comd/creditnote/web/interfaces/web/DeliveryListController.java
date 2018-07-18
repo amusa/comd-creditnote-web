@@ -63,8 +63,11 @@ public class DeliveryListController implements Serializable {
     }
 
     public void viewCreditNoteListener(Delivery delv) {
+        creditNote = null;
+
         if (delv == null) {
             JsfUtil.addErrorMessage("Delivery not selected");
+            logger.log(Level.INFO, "VDelivery not selected");
             return;
         }
 
@@ -74,6 +77,7 @@ public class DeliveryListController implements Serializable {
         String custId = selectedDelivery.getCustomer();
 
         logger.log(Level.INFO, "Viewing Credit Note of blDate={0}, customer={1}", new Object[]{dateStr, custId});
+        
         try {
             creditNote = creditNoteClient.creditNoteOfDelivery(dateStr, custId);
         } catch (Exception ex) {
@@ -88,7 +92,7 @@ public class DeliveryListController implements Serializable {
             JsfUtil.addErrorMessage("Error: B/L Date not selected");
             return;
         }
-        
+
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = blDate != null ? format.format(blDate) : null;
         String invoice;

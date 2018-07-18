@@ -9,16 +9,12 @@ import com.comd.creditnote.lib.v1.CreditNote;
 import com.comd.creditnote.web.application.CreditNoteService;
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
 import com.comd.creditnote.web.domain.model.Delivery;
-import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
-import com.comd.creditnote.web.interfaces.web.CreditNoteAdviceController;
 import com.comd.creditnote.web.interfaces.web.CreditNoteClient;
 import com.comd.creditnote.web.interfaces.web.CustomerClient;
 import com.comd.creditnote.web.interfaces.web.DeliveryClient;
 import com.comd.customer.lib.v1.response.Customer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 

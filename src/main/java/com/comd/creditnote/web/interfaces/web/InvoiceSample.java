@@ -8,19 +8,25 @@ package com.comd.creditnote.web.interfaces.web;
 import com.comd.creditnote.web.application.CreditNoteService;
 import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
 import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
+import com.comd.creditnote.web.util.NumberSpeller;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -29,6 +35,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.text.WordUtils;
 
 /**
  * @author Ayemi
@@ -42,6 +49,8 @@ public class InvoiceSample extends HttpServlet {
     private static Font smallReg = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
     private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
     private static Font smallBold2 = new Font(Font.FontFamily.COURIER, 12, Font.BOLD);
+    private static Font smallBoldUnderline = FontFactory.getFont(
+            BaseFont.TIMES_BOLD, 12, Font.UNDERLINE);
 
     @Inject
     private CreditNoteService creditNoteService;
@@ -128,63 +137,79 @@ public class InvoiceSample extends HttpServlet {
     public void addTable(Document layoutDocument) throws DocumentException {
 
         PdfPTable table = new PdfPTable(5);
-        table.setWidths(new float[]{110f, 110f, 110f, 110f, 50f});
-        table.setWidthPercentage(100);
-        // headers
+        table.setWidths(new float[]{110f, 110f, 100f, 120f, 50f});
 
-//        PdfPCell c1 = new PdfPCell(new Phrase("JV COMPANY", midBold));
-//        c1.setHorizontalAlignment(Element.ALIGN_CENTER);
-//        table.addCell(c1);
-        table.addCell(new Paragraph("BL Date", smallBold));
-        table.addCell(new Paragraph("Producer", smallBold));
-        table.addCell(new Paragraph("Crude Type", smallBold));
-        table.addCell(new Paragraph("Amount", smallBold));
-        table.addCell(new Paragraph(""));
+        table.setWidthPercentage(95);
+        table.getDefaultCell().setBorderWidth(0f);
+
+        table.addCell(getCell("BL Date", smallBoldUnderline));
+        table.addCell(getCell("Producer", smallBoldUnderline));
+        table.addCell(getCell("Crude Type", smallBoldUnderline, PdfPCell.ALIGN_CENTER));
+        table.addCell(getCell("Amount (US $)", smallBold, PdfPCell.ALIGN_CENTER));
+        table.addCell(getEmptyCell());
 
         // items        
-        table.addCell(new Paragraph("11/27/2014", smallReg));
-        table.addCell(new Paragraph("SPDC", smallReg));
-        table.addCell(new Paragraph("FB", smallReg));
-        table.addCell(new Paragraph("6,570", smallReg));
-        table.addCell(new Paragraph("90", smallReg));
+        table.addCell(getCell(creditNoteAdvice.getDelivery().dateAsString(), smallReg));
+        table.addCell(getCell(creditNoteAdvice.getProducer(), smallReg));
+        table.addCell(getCell(creditNoteAdvice.getCrudeName(), smallReg, PdfPCell.ALIGN_CENTER));
+        table.addCell(getCell(String.format("%,d", creditNoteAdvice.getCreditNote().getAmount().getIntValue().intValue()), smallReg, PdfPCell.ALIGN_CENTER));
+        table.addCell(getCell(String.format("%02d", creditNoteAdvice.getCreditNote().getAmount().getDecimalValue().intValue()), smallReg, PdfPCell.ALIGN_RIGHT));
 
         layoutDocument.add(table);
     }
 
     public static void addCustomerReference(Document layoutDocument) throws DocumentException, IOException {
-        Paragraph reference = new Paragraph();
 
         BaseFont bf = BaseFont.createFont(ARIAL_BLACK, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font f2 = new Font(bf, 14, Font.BOLD);
 
-        Paragraph line1 = new Paragraph(creditNoteAdvice.getCustomer(), f2);
-        line1.setAlignment(Element.ALIGN_LEFT);
-        line1.setMultipliedLeading(0.2f);
-        reference.add(line1);
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100f);
 
-        addEmptyLine(reference, 1);
+        table.addCell(getCell(creditNoteAdvice.getCustomer(), f2, PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell(String.format("CREDIT NOTE NO: %s", creditNoteAdvice.getCreditNote().getNumber().substring(0, 10)), f2, PdfPCell.ALIGN_RIGHT));
 
-        Paragraph line2 = new Paragraph(creditNoteAdvice.getAddress().getStreet(), f2);
-        line1.setMultipliedLeading(0.2f);
-        reference.add(line2);
+        table.addCell(getEmptyCell());
+        table.addCell(getEmptyCell());
 
-        addEmptyLine(reference, 1);
+        table.addCell(getCell(creditNoteAdvice.getAddress().getStreet(), f2, PdfPCell.ALIGN_LEFT));
+        table.addCell(getEmptyCell());
 
-        Paragraph line3 = new Paragraph(String.format("%s, %s",
+        table.addCell(getEmptyCell());
+        table.addCell(getEmptyCell());
+
+        table.addCell(getCell(String.format("%s, %s",
                 new Object[]{
                     creditNoteAdvice.getAddress().getCity(),
                     creditNoteAdvice.getAddress().getState()
-                }), f2);
-        line1.setMultipliedLeading(0.2f);
-        reference.add(line3);
+                }), f2, PdfPCell.ALIGN_LEFT));
+        table.addCell(getCell(String.format("%tD", LocalDate.now()),
+                f2, PdfPCell.ALIGN_RIGHT));
 
-        layoutDocument.add(reference);
+        layoutDocument.add(table);
+
     }
 
-    private static void addEmptyLine(Paragraph paragraph, int number) {
-        for (int i = 0; i < number; i++) {
-            paragraph.add(new Paragraph(" "));
-        }
+    private static PdfPCell getCell(String text, Font font, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
+    }
+
+    private static PdfPCell getCell(String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(PdfPCell.ALIGN_LEFT);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
+    }
+
+    private static PdfPCell getEmptyCell() {
+        PdfPCell cell = new PdfPCell(new Phrase(" "));
+        cell.setBorder(PdfPCell.NO_BORDER);
+        return cell;
     }
 
     private void addEmptyLine(Document layoutDocument, int number) {
@@ -198,26 +223,39 @@ public class InvoiceSample extends HttpServlet {
     }
 
     public static void addTitle(Document layoutDocument) throws DocumentException, IOException {
-        // layoutDocument.add(new Paragraph("RETAIL INVOICE").setFont(Font.BOLD).setUnderline().setTextAlignment(TextAlignment.CENTER));
-
         BaseFont bf = BaseFont.createFont(ARIAL_BLACK, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font f1 = new Font(bf, 16, Font.BOLD);
-
-        Paragraph title = new Paragraph("CREDIT NOTE NO: S-94/2018", f1);
+        String pTitle = String.format("CREDIT NOTE NO: %s", creditNoteAdvice.getCreditNote().getNumber());
+        Paragraph title = new Paragraph(pTitle, f1);
         title.setAlignment(Element.ALIGN_CENTER);
         layoutDocument.add(title);
     }
 
     public static void addBody(Document layoutDocument) throws DocumentException {
+        NumberSpeller converter = new NumberSpeller();
+        //MoneyConverters converter = MoneyConverters.ENGLISH_BANKING_MONEY_VALUE;
+
+        BigDecimal amount = creditNoteAdvice.getCreditNote().getAmount().getValue();
+
+        String moneyInWords = converter.toWords(new BigDecimal(amount.doubleValue()));
+        String moneyChunk = String.format("US$(%,.2f) %s ", amount.doubleValue(), WordUtils.capitalizeFully(moneyInWords));
+
         Paragraph body = new Paragraph();
-        body.setAlignment(Element.ALIGN_JUSTIFIED);
+        body.setAlignment(Element.ALIGN_LEFT);
+        body.setIndentationRight(70);
         body.add(new Chunk("To ", smallReg));
         body.add(new Chunk("CREDIT ", smallBold));
         body.add(new Chunk("you with the sum of ", smallReg));
-        body.add(new Chunk("(US$6,570.90) Six Thousand, Five Hundred and Seventy Dollars, Ninety Cents ", smallBold));
+        body.add(new Chunk(moneyChunk, smallBold));
         body.add(new Chunk("being the amount due to you as ", smallReg));
         body.add(new Chunk("demurrage claims ", smallBold));
-        body.add(new Chunk("from Vessel RIDGEBURY ASTARI with our Invoice Ref: COS/11/113/2014", smallReg));
+
+        String lastChunk = String.format("from Vessel %s with our Invoice Ref: %s",
+                creditNoteAdvice.getDelivery().getVesselName(),
+                creditNoteAdvice.getDelivery().getInvoiceNumber());
+
+        body.add(new Chunk(lastChunk, smallReg));
+
         layoutDocument.add(body);
     }
 
@@ -240,13 +278,16 @@ public class InvoiceSample extends HttpServlet {
         BaseFont bf = BaseFont.createFont(ARIAL_BLACK, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         Font f3 = new Font(bf, 12, Font.BOLD);
 
-        Paragraph signature = new Paragraph();
-        Paragraph sign1 = new Paragraph("ABAH, A. L. (MRS)", f3);
-        signature.add(sign1);
-        Paragraph sign2 = new Paragraph("FOR: GGM, COMD", f3);
-        signature.add(sign2);
+        PdfPTable signTable = new PdfPTable(2);
+        signTable.setWidthPercentage(100);
 
-        layoutDocument.add(signature);
+        signTable.addCell(getCell("ABAH, A. L. (MRS)", f3));
+        signTable.addCell(getCell("AMINA M. MOHAMMED", f3));
+
+        signTable.addCell(getCell("FOR: GGM, COMD", f3));
+        signTable.addCell(getCell("SUPVR. C&P RECON. COMD", f3));
+
+        layoutDocument.add(signTable);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

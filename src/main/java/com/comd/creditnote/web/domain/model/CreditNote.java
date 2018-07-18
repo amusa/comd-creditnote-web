@@ -5,6 +5,8 @@
  */
 package com.comd.creditnote.web.domain.model;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author maliska
@@ -12,22 +14,22 @@ package com.comd.creditnote.web.domain.model;
 public class CreditNote {
 
     private String number;
-    private double value;
+    private Amount amount;
 
     public CreditNote() {
     }
 
     public CreditNote(String number, double value) {
         this.number = number;
-        this.value = value;
+        this.amount = new Amount(new BigDecimal(value));
     }
 
-    public double getValue() {
-        return value;
+    public Amount getAmount() {
+        return amount;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public void setAmount(Amount amount) {
+        this.amount = amount;
     }
 
     public String getNumber() {

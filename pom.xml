@@ -133,6 +133,25 @@
             <version>5.5.13</version>
         </dependency>
         <!--        <dependency>
+            <groupId>pl.allegro.finance</groupId>
+            <artifactId>tradukisto</artifactId>
+            <version>1.4.1</version>
+        </dependency>-->
+        
+        <!-- https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>62.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <!--        <dependency>
             <groupId>org.wildfly.swarm</groupId>
             <artifactId>microprofile</artifactId>
         </dependency>  -->

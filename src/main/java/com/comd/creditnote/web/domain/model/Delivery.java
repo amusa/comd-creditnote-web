@@ -5,6 +5,7 @@
  */
 package com.comd.creditnote.web.domain.model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -58,6 +59,11 @@ public class Delivery {
 
     public void setCargoValue(double cargoValue) {
         this.cargoValue = cargoValue;
+    }
+
+    public String dateAsString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.format(blDate);
     }
 
 }
