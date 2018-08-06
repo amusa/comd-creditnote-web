@@ -31,7 +31,7 @@ public class CreditNoteAdviceController implements Serializable {
     Logger logger;
 
     @Inject
-    private CreditNoteService creditNoteService;
+    private transient CreditNoteService creditNoteService;
 
     private String blDate;
     private String customerId;

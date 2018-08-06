@@ -29,7 +29,7 @@ public class CustCreditNoteController implements Serializable {
     Logger logger;
 
     @Inject
-    private CreditNoteClient creditNoteClient;
+    private transient CreditNoteClient creditNoteClient;
 
     private String customerId;
     private List<CreditNote> creditNotes;

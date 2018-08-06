@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <module-name>creditnote-web</module-name>
+    
+    <security-constraint>
+        <web-resource-collection>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <!-- Role of the previously created user -->
+            <role-name>manager</role-name>
+        </auth-constraint>
+    </security-constraint>
+ 
+    <login-config>
+        <!-- Set authorization method to KEYCLOAK instead of BASIC --> 
+        <auth-method>KEYCLOAK</auth-method>
+        <realm-name>comd</realm-name>
+    </login-config>
     <context-param>
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>

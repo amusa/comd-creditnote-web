@@ -57,11 +57,21 @@
                         </div>
                     </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search"/>
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                <!--                <form class="form-inline my-2 my-lg-0">
+                                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search"/>
+                                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                                </form>-->
             </div>
+            <ul class="navbar-nav px-3">
+                <li class="nav-item text-nowrap">
+                    <!--                    <a class="nav-link" href="#">Sign out</a>-->
+                    <h:form>
+                        <h:commandLink class="nav-link" value="Sign out">
+                            <f:ajax listener="#{appController.logout}" event="click"/>
+                        </h:commandLink>                        
+                    </h:form>
+                </li>
+            </ul>
         </nav>
 
         <main role="main" class="container-fluid">            

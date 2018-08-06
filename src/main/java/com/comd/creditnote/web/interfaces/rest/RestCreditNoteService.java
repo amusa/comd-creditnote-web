@@ -25,6 +25,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  *
@@ -40,9 +41,10 @@ public class RestCreditNoteService implements CreditNoteClient {
     @Inject
     Logger logger;
 
-    // @Inject
-    //ConfigProperty(name = "CREDITNOTE_SERVICE_URL")
-    private final static String CREDITNOTE_SERVICE_URL = "http://localhost:8085/comd-creditnote-api/v1";
+     @Inject
+    @ConfigProperty(name = "CREDITNOTE_SERVICE_URL")
+     private String creditNoteServiceUrl;
+//    private final static String CREDITNOTE_SERVICE_URL = "http://localhost:8085/comd-creditnote-api/v1";
 
     @Override
     public String post(String blDate, String vesselId, String customerId, String invoice, double amount) throws Exception {
@@ -55,10 +57,10 @@ public class RestCreditNoteService implements CreditNoteClient {
         request.setInvoice(invoice);
         request.setAmount(amount);
 
-        target = client.target(CREDITNOTE_SERVICE_URL)
+        target = client.target(creditNoteServiceUrl)
                 .path("/creditnote");
 
-        logger.log(Level.INFO, "Calling external webservice @ {0}", CREDITNOTE_SERVICE_URL);
+        logger.log(Level.INFO, "Calling external webservice @ {0}", creditNoteServiceUrl);
         Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity(request, MediaType.APPLICATION_JSON), Response.class);
 
         String responseMessage;
@@ -89,7 +91,7 @@ public class RestCreditNoteService implements CreditNoteClient {
     @Override
     public CreditNote creditNoteOfDelivery(String blDate, String customerId) throws Exception {
         client = ClientBuilder.newClient();
-        target = client.target(CREDITNOTE_SERVICE_URL)
+        target = client.target(creditNoteServiceUrl)
                 .path("/creditnote")
                 .queryParam("bldate", blDate)
                 .queryParam("customer", customerId);
@@ -124,7 +126,7 @@ public class RestCreditNoteService implements CreditNoteClient {
     @Override
     public List<CreditNote> creditNotesOfCustomer(String customerId) throws Exception {
         client = ClientBuilder.newClient();
-        target = client.target(CREDITNOTE_SERVICE_URL)
+        target = client.target(creditNoteServiceUrl)
                 .path("/creditnote/customer")
                 .path(customerId);
 

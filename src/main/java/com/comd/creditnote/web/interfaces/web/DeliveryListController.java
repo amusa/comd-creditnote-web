@@ -35,10 +35,10 @@ public class DeliveryListController implements Serializable {
     Logger logger;
 
     @Inject
-    private DeliveryClient deliveryClient;
+    private transient DeliveryClient deliveryClient;
 
     @Inject
-    private CreditNoteClient creditNoteClient;
+    private transient CreditNoteClient creditNoteClient;
 
     private Date blDate;
     private String customerId;
