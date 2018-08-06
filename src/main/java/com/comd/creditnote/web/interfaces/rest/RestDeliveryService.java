@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 import com.comd.creditnote.web.util.CreditNoteLogger;
 import java.util.logging.Level;
 import javax.ws.rs.core.GenericType;
-//import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  *
@@ -29,27 +29,28 @@ import javax.ws.rs.core.GenericType;
  */
 @Stateless
 public class RestDeliveryService implements DeliveryClient {
-    
+
     private Client client;
     private WebTarget target;
-    
+
     @CreditNoteLogger
     @Inject
     Logger logger;
 
-    // @Inject
-    //ConfigProperty(name = "DELIVERY_SERVICE_URL")
-    private final static String DELIVERY_SERVICE_URL = "http://localhost:8090/comd-delivery-api/v1";
-    
+    @Inject
+    @ConfigProperty(name = "DELIVERY_SERVICE_URL")
+    private String deliveryUrl;
+//    private final static String DELIVERY_SERVICE_URL = "http://localhost:8090/comd-delivery-api/v1";
+
     @Override
     public List<Delivery> delivery(String blDate, String vesselId, String customerId) throws Exception {
         client = ClientBuilder.newClient();
-        target = client.target(DELIVERY_SERVICE_URL)
+        target = client.target(deliveryUrl)
                 .path("/delivery")
                 .queryParam("bldate", blDate)
                 .queryParam("customer", customerId)
                 .queryParam("vessel", vesselId);
-        
+
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         List<Delivery> deliveries = new ArrayList<>();
         try {
@@ -69,8 +70,8 @@ public class RestDeliveryService implements DeliveryClient {
         } finally {
             response.close();
         }
-        
+
         return deliveries;
     }
-    
+
 }

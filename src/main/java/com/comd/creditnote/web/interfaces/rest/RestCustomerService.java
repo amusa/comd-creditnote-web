@@ -24,7 +24,7 @@ import com.comd.customer.lib.v1.response.CustomerListResponse;
 import com.comd.customer.lib.v1.response.CustomerResponse;
 import java.util.logging.Level;
 import javax.ws.rs.core.GenericType;
-//import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  *
@@ -40,17 +40,18 @@ public class RestCustomerService implements CustomerClient {
     @Inject
     Logger logger;
 
-    // @Inject
-    //ConfigProperty(name = "DELIVERY_SERVICE_URL")
-    private final static String CUSTOMER_SERVICE_URL = "http://localhost:9090/comd-customer-api/v1";
+    @Inject
+    @ConfigProperty(name = "CUSTOMER_SERVICE_URL")
+    private String customerServiceUrl;
+//    private final static String CUSTOMER_SERVICE_URL = "http://localhost:9090/comd-customer-api/v1";
 
     @Override
     public Customer customer(String customerNumber) throws CustomerException {
         client = ClientBuilder.newClient();
-        target = client.target(CUSTOMER_SERVICE_URL)
+        target = client.target(customerServiceUrl)
                 .path("/customer/")
                 .path(customerNumber);
-        
+
         logger.log(Level.INFO, "Invoking customer service endpoint: {0}", target.getUri());
 
         Response response = target.request(MediaType.APPLICATION_JSON).get();
@@ -60,13 +61,13 @@ public class RestCustomerService implements CustomerClient {
                 CustomerResponse customerResponse = response.readEntity(CustomerResponse.class);
                 customer = customerResponse.getCustomer();
             } else if (response.getStatus() == 400) {
-                 logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
+                logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
                 throw new CustomerException("No data returned for the given selection");
             } else if (response.getStatus() == 404) {
-                 logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
                 throw new CustomerException("Resource not found");
             } else if (response.getStatus() == 500) {
-                 logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
                 throw new CustomerException("Internal server error!");
             } else {
                 logger.log(Level.SEVERE, "Unexpected error occured! return code: {0}", response.getStatus());
@@ -82,11 +83,11 @@ public class RestCustomerService implements CustomerClient {
     @Override
     public List<Customer> customers() throws CustomerException {
         client = ClientBuilder.newClient();
-        target = client.target(CUSTOMER_SERVICE_URL)
+        target = client.target(customerServiceUrl)
                 .path("/customer");
 
         logger.log(Level.INFO, "Invoking customer service endpoint: {0}", target.getUri());
-        
+
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         List<Customer> customers = new ArrayList<>();
         try {
@@ -94,10 +95,10 @@ public class RestCustomerService implements CustomerClient {
                 CustomerListResponse customerResponse = response.readEntity(CustomerListResponse.class);
                 customers = customerResponse.getCustomerList();
             } else if (response.getStatus() == 400) {
-                 logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
+                logger.log(Level.SEVERE, "No data returned for the given selection. Return code: {0}", response.getStatus());
                 throw new CustomerException("No data returned for the given selection");
             } else if (response.getStatus() == 404) {
-                 logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Resource not found. Return code: {0}", response.getStatus());
                 throw new CustomerException("Resource not found");
             } else if (response.getStatus() == 500) {
                 logger.log(Level.SEVERE, "Internal server error! Return code: {0}", response.getStatus());
