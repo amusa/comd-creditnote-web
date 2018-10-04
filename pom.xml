@@ -14,10 +14,11 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.thorntail>2.0.0.Final</version.thorntail>
-        <docker.image>maliska/creditnote-web:latest</docker.image>
+        <docker.image>comd/creditnote-web:latest</docker.image>
     </properties>
     
     <build>
+        <finalName>comd-creditnote-web</finalName>   
         <plugins>
             <plugin>
                 <groupId>io.thorntail</groupId>
@@ -37,7 +38,7 @@
                     </properties>
                 </configuration>
             </plugin>
-            <!--            <plugin>
+            <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>0.26.0</version>                
@@ -55,19 +56,19 @@
                                     <inline>
                                         <files>
                                             <file>
-                                                <source>${project.build.directory}/${project.artifactId}-swarm.jar</source>
+                                                <source>${project.build.directory}/${project.artifactId}-thorntail.jar</source>
                                             </file>
                                         </files>
                                     </inline>
                                 </assembly>
-                                <cmd>java -jar /maven/${project.artifactId}-swarm.jar</cmd>
+                                <cmd>java -Djava.net.preferIPv4Stack=true -jar /maven/${project.artifactId}-thorntail.jar</cmd>
                             </build>
-                            <run>
+<!--                            <run>
                                 <ports>
-                                     Map container port 8080 to a dynamical port 
+                                    Map container port 8080 to a dynamical port 
                                     <port>${swarm.port}:8180</port>
                                 </ports>
-                                                                <env>
+                                <env>
                                     <COUCHBASE_URI>${docker.host.address}</COUCHBASE_URI>
                                 </env>
                                 <wait>
@@ -81,7 +82,7 @@
                                     <color>yellow</color>
                                     <prefix>SWARM</prefix>
                                 </log>
-                            </run>
+                            </run>-->
                         </image>
                     </images>
                 </configuration>
@@ -102,7 +103,7 @@
                         </goals>
                     </execution>
                 </executions>                
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
     
@@ -150,10 +151,10 @@
             <artifactId>commons-text</artifactId>
             <version>1.4</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>keycloak</artifactId>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>jsf</artifactId>
