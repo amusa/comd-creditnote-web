@@ -35,6 +35,7 @@ public class CreditNoteAdviceController implements Serializable {
 
     private String blDate;
     private String customerId;
+    private String invoiceNo;
 
     private CreditNoteAdvice creditNoteAdvice;
 
@@ -46,7 +47,7 @@ public class CreditNoteAdviceController implements Serializable {
     public void viewParamListener() {
         logger.log(Level.INFO, "B/L date={0}, customerId={1}", new Object[]{blDate, customerId});
         try {
-            creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDate);
+            creditNoteAdvice = creditNoteService.generateCreditNoteAdvice(customerId, blDate, invoiceNo);
         } catch (Exception cex) {
             JsfUtil.addErrorMessage(cex.getMessage());
             logger.log(Level.SEVERE, null, cex);
@@ -75,6 +76,14 @@ public class CreditNoteAdviceController implements Serializable {
 
     public void setBlDate(String blDate) {
         this.blDate = blDate;
+    }
+
+    public String getInvoiceNo() {
+        return invoiceNo;
+    }
+
+    public void setInvoiceNo(String invoiceNo) {
+        this.invoiceNo = invoiceNo;
     }
 
 }

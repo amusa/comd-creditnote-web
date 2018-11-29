@@ -18,12 +18,14 @@ public class Delivery {
     private String vesselName;
     private String invoiceNumber;
     private double cargoValue;
+    private String invoiceRef;
 
-    public Delivery(Date blDate, String vesselName, String invoiceNumber, double cargoValue) {
+    public Delivery(Date blDate, String vesselName, String invoiceNumber, double cargoValue, String invoiceRef) {
         this.blDate = blDate;
         this.vesselName = vesselName;
         this.invoiceNumber = invoiceNumber;
         this.cargoValue = cargoValue;
+        this.invoiceRef = invoiceRef;
     }
 
     public Delivery() {
@@ -64,6 +66,14 @@ public class Delivery {
     public String dateAsString() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         return sdf.format(blDate);
+    }
+
+    public String getInvoiceRef() {
+        return invoiceRef;
+    }
+
+    public void setInvoiceRef(String invoiceRef) {
+        this.invoiceRef = invoiceRef;
     }
 
 }

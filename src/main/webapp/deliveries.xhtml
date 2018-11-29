@@ -27,7 +27,7 @@
     </h:head>
     <f:metadata>        
         <f:viewParam name="blDate" value="#{listController.dateAsString}" />           
-        <f:viewParam name="customerId" value="#{listController.customerId}" />
+        <f:viewParam name="customerId" value="#{listController.currentCustomer.number}" />
     </f:metadata>
     <body>       
 
@@ -86,20 +86,29 @@
                 <h:form id="delvForm">
                     <div class="form-row">
                         <div class="col">
-                            <h:inputText id="txtBlDate" value="#{listController.blDate}" class="form-control" pt:placeholder="B/L Date">
+                            <h:inputText id="txtBlDate" value="#{listController.blDate}" class="form-control" pt:placeholder="B/L Date"
+                                         pt:type="date" pt:max="3000-12-31" pt:min="1000-01-01">
                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                                 <!--<f:ajax />-->
-                            </h:inputText>
+                            </h:inputText>                            
+                        </div>
+                        <div class="col">                            
+                            <h:selectOneMenu id="txtVessel" value="#{listController.vesselId}" class="form-control" pt:placeholder="Vessel">                                              
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <!--<f:ajax />-->
+                            </h:selectOneMenu>
                         </div>
                         <div class="col">
-                            <input jsf:id="txtVessel" jsf:value="#{listController.vesselId}" type="text" class="form-control" placeholder="Vessel">
+                            <h:selectOneMenu id="txtCustomer" value="#{listController.currentCustomer}" class="form-control" pt:placeholder="Customer">                                              
+                                <f:selectItem itemValue="#{null}" itemLabel="--select--" />
+                                <f:selectItems value="#{listController.customerSelectOptions}" />
+                                <f:converter binding="#{customerConverter}" />
                                 <!--<f:ajax />-->
-                            </input>
-                        </div>
-                        <div class="col">
-                            <h:inputText  id="txtCustomer" value="#{listController.customerId}" class="form-control" pt:placeholder="Customer">
-                                <!--<f:ajax />-->
-                            </h:inputText>
+                            </h:selectOneMenu>
+
+                            <!--                            <h:inputText  id="txtCustomer" value="" class="form-control" pt:placeholder="Customer">
+                                                            <f:ajax />
+                                                        </h:inputText>-->
                         </div>
                         <button jsf:id="findBtn"  type="button" class="btn btn-primary">Find Delivery
                             <f:ajax listener="#{listController.findDeliveries}" event="click"
@@ -112,15 +121,16 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">B/L Date</th>
+                                    <th scope="col">Delv #</th>
                                     <th scope="col">Vessel</th>
                                     <th scope="col">Quantity</th>
                                     <th scope="col">Unit Price ($)</th>
                                     <th scope="col">Amount ($)</th>
                                     <th scope="col">Crude Name</th>
                                     <th scope="col">Producer</th>
-                                    <th scope="col">Invoice #</th>
-                                    <th scope="col">Customer</th>
-                                    <th scope="col">Order Reason</th>
+                                    <th scope="col">Billing #</th>
+                                    <th scope="col">Invoice Ref#</th>
+                                    <th scope="col">Customer</th>                                    
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -132,8 +142,13 @@
                                                 <f:convertDateTime pattern="yyyy-MM-dd" />
                                             </h:outputText>                                           
                                         </th>
-                                        <td>#{delivery.vesselName}</td>
-                                        <td>#{delivery.quantity}</td>
+                                        <td>#{delivery.deliveryNumber}</td>
+                                        <td>#{delivery.vesselName}</td>                                        
+                                        <td>
+                                            <h:outputText value="#{delivery.quantity}">
+                                                <f:convertNumber pattern="###,###,###.####" />
+                                            </h:outputText>
+                                        </td>
                                         <td>
                                             <h:outputText value="#{delivery.unitPrice}">
                                                 <f:convertNumber pattern="###,###,###.####" />
@@ -147,8 +162,9 @@
                                         <td>#{delivery.crudeName}</td>
                                         <td>#{delivery.producer}</td>
                                         <td>#{delivery.invoiceNumber}</td>
+                                        <td>#{delivery.invoiceRef}</td>
                                         <td>#{delivery.customer}</td>
-                                        <td>#{delivery.orderReason}</td>
+                                        
                                         <td>
                                             <div class="dropdown">
                                                 <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -161,7 +177,7 @@
                                                         <f:ajax listener="#{listController.viewCreditNoteListener(delivery)}" event="click" render="msgs VwCrdNoteForm"/>
 
                                                     </button>
-                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:actionListener="#{listController.creditNoteAdvice}">
+                                                    <button jsf:id="btnViewCreditNoteAdvice" class="dropdown-item" jsf:actionListener="#{listController.creditNoteAdvice(delivery)}">
                                                         View Cr. Note Adv                                                                                                             
                                                     </button>
                                                     <a class="dropdown-item" href="#">View Dr. Note Adv</a>
@@ -365,7 +381,9 @@
                                 </div>
                                 <label for="amount" class="col-sm-4 col-form-label">Amount</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control-plaintext" id="amount" value="#{listController.creditNote.amount}"/>
+                                    <input jsf:id="cnAmount" type="text" class="form-control-plaintext" id="amount" value="#{listController.creditNote.amount}">
+                                        <f:convertNumber pattern="###,###,###.####" />
+                                    </input>
                                 </div>
                             </div>
                         </div>

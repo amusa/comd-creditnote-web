@@ -35,7 +35,7 @@ public class DefaultCreditNoteService implements CreditNoteService {
     private CustomerClient customerClient;
 
     @Override
-    public CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate) throws Exception {
+    public CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate, String invoiceNo) throws Exception {
         List<com.comd.delivery.lib.v1.Delivery> deliveries = new ArrayList<>();
         CreditNoteAdvice creditNoteAdvice;
 
@@ -45,7 +45,7 @@ public class DefaultCreditNoteService implements CreditNoteService {
             throw new Exception("No deliveries found!");
         }
         
-        CreditNote creditNote = creditNoteClient.creditNoteOfDelivery(blDate, customerId);
+        CreditNote creditNote = creditNoteClient.creditNoteOfDelivery(blDate, customerId, invoiceNo);
 
         Customer customer = customerClient.customer(customerId);
 
@@ -57,7 +57,7 @@ public class DefaultCreditNoteService implements CreditNoteService {
                 creditNote.getAmount()));
         creditNoteAdvice.setDelivery(
                 new Delivery(
-                        delivery.getBlDate(), delivery.getVesselName(), delivery.getInvoiceNumber(), delivery.getNetValue())
+                        delivery.getBlDate(), delivery.getVesselName(), delivery.getInvoiceNumber(), delivery.getNetValue(), delivery.getInvoiceRef())
         );
         creditNoteAdvice.setCustomer(customer.getName());
         creditNoteAdvice.setProducer(delivery.getProducer());

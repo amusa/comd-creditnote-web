@@ -16,7 +16,7 @@ public interface CreditNoteClient {
 
     String post(String blDate, String vesselId, String customerId, String invoice, double amount) throws Exception;
 
-    CreditNote creditNoteOfDelivery(String blDate, String customerId) throws Exception;
+    CreditNote creditNoteOfDelivery(String blDate, String customerId, String invoiceNo) throws Exception;
 
     List<CreditNote> creditNotesOfCustomer(String customerId) throws Exception;
 

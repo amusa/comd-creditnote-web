@@ -12,6 +12,6 @@ import com.comd.creditnote.web.domain.model.CreditNoteAdvice;
  * @author maliska
  */
 public interface CreditNoteService {
-    CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate) throws Exception;
+    CreditNoteAdvice generateCreditNoteAdvice(String customerId, String blDate, String invoiceNo) throws Exception;
     String postCreditNote(String dateStr, String vesselId, String customerId, String invoice, String creditNoteAmount);
 }

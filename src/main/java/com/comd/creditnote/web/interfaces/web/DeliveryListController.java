@@ -6,6 +6,7 @@
 package com.comd.creditnote.web.interfaces.web;
 
 import com.comd.creditnote.lib.v1.CreditNote;
+import com.comd.creditnote.web.interfaces.rest.exceptions.CustomerException;
 import com.comd.delivery.lib.v1.Delivery;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -17,10 +18,13 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import com.comd.creditnote.web.util.CreditNoteLogger;
 import com.comd.creditnote.web.util.JsfUtil;
+import com.comd.customer.lib.v1.response.Customer;
 import java.io.IOException;
 import java.text.ParseException;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 
 /**
  *
@@ -40,20 +44,34 @@ public class DeliveryListController implements Serializable {
     @Inject
     private transient CreditNoteClient creditNoteClient;
 
+    @Inject
+    private transient CustomerClient customerClient;
+
     private Date blDate;
-    private String customerId;
+    //private String customerId;
+    private Customer currentCustomer;
     private String vesselId;
     private List<Delivery> deliveries;
     private Delivery selectedDelivery;
     private Double creditNoteAmount;
     private CreditNote creditNote;
+    private List<Customer> customers;
+
+    @PostConstruct
+    public void init() {
+        try {
+            customers = customerClient.customers();
+        } catch (CustomerException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
 
     public void findDeliveries() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = blDate != null ? format.format(blDate) : null;
-        logger.log(Level.INFO, "about to execute find...{0} {1} {2}", new Object[]{dateStr, vesselId, customerId});
+        logger.log(Level.INFO, "about to execute find...{0} {1} {2}", new Object[]{dateStr, vesselId, currentCustomer.getNumber()});
         try {
-            deliveries = getDeliveryClient().delivery(dateStr, vesselId, customerId);
+            deliveries = getDeliveryClient().delivery(dateStr, vesselId, currentCustomer.getNumber());
             JsfUtil.addErrorMessage("Delivery fetched from SAP successfully!");
         } catch (Exception ex) {
             deliveries = null;
@@ -67,7 +85,7 @@ public class DeliveryListController implements Serializable {
 
         if (delv == null) {
             JsfUtil.addErrorMessage("Delivery not selected");
-            logger.log(Level.INFO, "VDelivery not selected");
+            logger.log(Level.INFO, "Delivery not selected");
             return;
         }
 
@@ -75,11 +93,12 @@ public class DeliveryListController implements Serializable {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String dateStr = format.format(selectedDelivery.getBlDate());
         String custId = selectedDelivery.getCustomer();
+        String invoiceNo = selectedDelivery.getInvoiceNumber();
 
         logger.log(Level.INFO, "Viewing Credit Note of blDate={0}, customer={1}", new Object[]{dateStr, custId});
-        
+
         try {
-            creditNote = creditNoteClient.creditNoteOfDelivery(dateStr, custId);
+            creditNote = creditNoteClient.creditNoteOfDelivery(dateStr, custId, invoiceNo);
         } catch (Exception ex) {
             creditNote = null;
             JsfUtil.addErrorMessage(ex.getMessage());
@@ -109,9 +128,9 @@ public class DeliveryListController implements Serializable {
 
         invoice = selectedDelivery.getInvoiceNumber();
         logger.log(Level.INFO, "about to post...{0} {1} {2} {3} {4}",
-                new Object[]{dateStr, vesselId, customerId, invoice, creditNoteAmount});
+                new Object[]{dateStr, vesselId, currentCustomer.getNumber(), invoice, creditNoteAmount});
         try {
-            String message = getCreditNoteClient().post(dateStr, vesselId, customerId, invoice, creditNoteAmount);
+            String message = getCreditNoteClient().post(dateStr, vesselId, currentCustomer.getNumber(), invoice, creditNoteAmount);
             JsfUtil.addErrorMessage(message);
         } catch (Exception ex) {
             JsfUtil.addErrorMessage(ex.getMessage());
@@ -119,11 +138,21 @@ public class DeliveryListController implements Serializable {
         }
     }
 
-    public void creditNoteAdvice() throws IOException {
-        logger.log(Level.INFO, "navigating to creditnoteadvice.xhtml page...");
+    public void creditNoteAdvice(Delivery currentDelivery) throws IOException {
 
-        FacesContext.getCurrentInstance().getExternalContext()
-                .redirect(String.format("invoice?customer=%s&bldate=%s", customerId, getDateAsString()));
+        if (currentDelivery != null) {
+            String invoice = currentDelivery.getInvoiceNumber();
+            String custId = currentDelivery.getCustomer();
+            String blDateStr = getDateAsString(currentDelivery.getBlDate());
+
+            logger.log(Level.INFO, "navigating to creditnoteadvice.xhtml page...");
+
+            FacesContext.getCurrentInstance().getExternalContext()
+                    .redirect(String.format("creditNoteAdvice?customer=%s&bldate=%s&invoice=%s", custId, blDateStr, invoice));
+            return;
+        }
+
+        logger.log(Level.INFO, "--- delivery not set ---");
 
         // return "creditnoteadvice?faces-redirect=true&includeViewParams=true";
     }
@@ -145,14 +174,22 @@ public class DeliveryListController implements Serializable {
         this.blDate = blDate;
     }
 
-    public String getCustomerId() {
-        return customerId;
+    public Customer getCurrentCustomer() {
+        return currentCustomer;
     }
 
-    public void setCustomerId(String customerId) {
-        logger.log(Level.INFO, "setting customerId {0}...", customerId);
-        this.customerId = customerId;
+    public void setCurrentCustomer(Customer currentCustomer) {
+        this.currentCustomer = currentCustomer;
     }
+
+//    public String getCustomerId() {
+//        return customerId;
+//    }
+//
+//    public void setCustomerId(String customerId) {
+//        logger.log(Level.INFO, "setting customerId {0}...", customerId);
+//        this.customerId = customerId;
+//    }
 
     public String getVesselId() {
         return vesselId;
@@ -190,8 +227,12 @@ public class DeliveryListController implements Serializable {
     }
 
     public String getDateAsString() {
+        return getDateAsString(blDate);
+    }
+
+    public String getDateAsString(Date date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        return blDate != null ? format.format(blDate) : null;
+        return date != null ? format.format(date) : null;
     }
 
     public void setDateAsString(String dateStr) throws ParseException {
@@ -205,6 +246,14 @@ public class DeliveryListController implements Serializable {
 
     public void setCreditNote(CreditNote creditNote) {
         this.creditNote = creditNote;
+    }
+
+    private List<Customer> getCustomers() {
+        return customers;
+    }
+
+    public SelectItem[] getCustomerSelectOptions() {
+        return JsfUtil.getSelectItems(getCustomers(), false);
     }
 
 }

@@ -84,7 +84,7 @@ public class RestCustomerService implements CustomerClient {
     public List<Customer> customers() throws CustomerException {
         client = ClientBuilder.newClient();
         target = client.target(customerServiceUrl)
-                .path("/customer");
+                .path("/customer/");
 
         logger.log(Level.INFO, "Invoking customer service endpoint: {0}", target.getUri());
 

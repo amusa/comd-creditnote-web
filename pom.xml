@@ -14,7 +14,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.thorntail>2.0.0.Final</version.thorntail>
-        <docker.image>comd/creditnote-web:latest</docker.image>
+        <docker.image>comd/creditnote-web:latest</docker.image>     
+        <itext.version>RELEASE</itext.version>
     </properties>
     
     <build>
@@ -63,7 +64,7 @@
                                 </assembly>
                                 <cmd>java -Djava.net.preferIPv4Stack=true -jar /maven/${project.artifactId}-thorntail.jar</cmd>
                             </build>
-<!--                            <run>
+                            <!--                            <run>
                                 <ports>
                                     Map container port 8080 to a dynamical port 
                                     <port>${swarm.port}:8180</port>
@@ -128,11 +129,20 @@
             <artifactId>comd-customer-lib</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+        <!--        <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
-            <version>5.5.13</version>
-        </dependency>
+            <version>5.5.13</version>          
+        </dependency>-->
+                
+        <!-- add all iText 7 Core modules -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>${itext.version}</version>
+            <type>pom</type>
+        </dependency
+        >
         <!--        <dependency>
             <groupId>pl.allegro.finance</groupId>
             <artifactId>tradukisto</artifactId>
@@ -151,7 +161,7 @@
             <artifactId>commons-text</artifactId>
             <version>1.4</version>
         </dependency>
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>keycloak</artifactId>
         </dependency>-->
@@ -188,5 +198,13 @@
     </dependencyManagement>
     
    
-    
+    <!-- All add-ons and iText 7 core-->
+    <!--    <repositories>
+        <repository>
+            <id>itext</id>
+            <name>iText Repository - releases</name>
+            <url>https://repo.itextsupport.com/releases</url>
+        </repository>
+    </repositories>-->
+  
 </project>

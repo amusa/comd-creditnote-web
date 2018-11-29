@@ -41,9 +41,9 @@ public class RestCreditNoteService implements CreditNoteClient {
     @Inject
     Logger logger;
 
-     @Inject
+    @Inject
     @ConfigProperty(name = "CREDITNOTE_SERVICE_URL")
-     private String creditNoteServiceUrl;
+    private String creditNoteServiceUrl;
 //    private final static String CREDITNOTE_SERVICE_URL = "http://localhost:8085/comd-creditnote-api/v1";
 
     @Override
@@ -72,7 +72,7 @@ public class RestCreditNoteService implements CreditNoteClient {
                 logger.log(Level.SEVERE, "No data returned for the given selection. return code {0}", response.getStatus());
                 throw new Exception("No data returned for the given selection");
             } else if (response.getStatus() == 404) {
-                logger.log(Level.SEVERE, "esource not found. return code {0}", response.getStatus());
+                logger.log(Level.SEVERE, "Resource not found. return code {0}", response.getStatus());
                 throw new Exception("Resource not found");
             } else if (response.getStatus() == 500) {
                 logger.log(Level.SEVERE, "Internal server error!. return code {0}", response.getStatus());
@@ -89,12 +89,13 @@ public class RestCreditNoteService implements CreditNoteClient {
     }
 
     @Override
-    public CreditNote creditNoteOfDelivery(String blDate, String customerId) throws Exception {
+    public CreditNote creditNoteOfDelivery(String blDate, String customerId, String invoiceNo) throws Exception {
         client = ClientBuilder.newClient();
         target = client.target(creditNoteServiceUrl)
                 .path("/creditnote")
                 .queryParam("bldate", blDate)
-                .queryParam("customer", customerId);
+                .queryParam("customer", customerId)
+                .queryParam("invoice", invoiceNo);
 
         logger.log(Level.INFO, "Invoking credit note service endpoint: {0}", target.getUri());
 
@@ -135,7 +136,7 @@ public class RestCreditNoteService implements CreditNoteClient {
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         List<CreditNote> creditNotes;
         try {
-            if (response.getStatus() == 200) {            
+            if (response.getStatus() == 200) {
                 creditNotes = response.readEntity(new GenericType<List<CreditNote>>() {
                 });
             } else if (response.getStatus() == 400) {
